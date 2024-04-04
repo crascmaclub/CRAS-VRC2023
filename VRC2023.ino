@@ -1,13 +1,13 @@
-// Include các thư viện cần thiết
+// Include necessary lib
 #include <Adafruit_PWMServoDriver.h>
 #include <PS2X_lib.h>
 #include <Wire.h>
 
-// Khai báo các class
+// Classes
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 PS2X ps2x;
 
-// Define các chân PS2
+// Define input PS2
 #define PS2_DAT 12 // MISO 
 #define PS2_CMD 13 // MOSI 
 #define PS2_SEL 15 // SS 
@@ -16,7 +16,7 @@ PS2X ps2x;
 #define rumble false
 
 
-// Define các chân Motor DC/Servo (D là (+), A là (-), SV là Servo )
+// Define input Motor DC/Servo (D = (+), A = (-), SV = Servo )
 #define DT 8
 #define AT 9
 #define DP 14
@@ -36,19 +36,19 @@ PS2X ps2x;
 #define GREEN 25
 
 
-bool cuon = false; // Biến cuốn bóng
-bool ban = false; // Biến bắn bóng
-bool quaybanh = false;  // Biến quay bánh đà
-int sp = 3071; // Biến tốc độ
-bool boost = false; // Biến boost
-int ext = 950; // Góc servo extension
-int doc = 1610; // Góc servo dốc
-int led = 0; // Biến led
-bool nguoc = false; // Biến quay ngược 
+bool cuon = false; 
+bool ban = false; 
+bool quaybanh = false;  
+int sp = 3071; 
+bool boost = false; 
+int ext = 950; 
+int doc = 1610; 
+int led = 0; 
+bool nguoc = false; 
 
 void setup() {
  
-  Serial.begin(115200); // Cài đặt giao tiếp với robot
+  Serial.begin(115200); 
 
   // Setup led
   ledcSetup(RED , 5000, 8);
@@ -62,14 +62,14 @@ void setup() {
   ledcWrite(RED, 255);
   ledcWrite(BLUE, 255);
   
-  // --- Khởi tạo mạch via ---
+  // --- Startup ViA B ---
   pwm.begin();
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(50);
   Wire.setClock(400000);
 
-  pwm.writeMicroseconds(SVE, ext); // Set servo extension về góc ban đầu
-  pwm.writeMicroseconds(SVD, doc); // Set servo dốc nghiêng về góc ban đầu
+  pwm.writeMicroseconds(SVE, ext); // Set servo extension 
+  pwm.writeMicroseconds(SVD, doc); // Set servo steep
 
   // --- Check error ps2 ---
   int error = -1; 
@@ -89,8 +89,8 @@ void loop(){
   ps2x.read_gamepad(false, false);  
 
 
-  // Di chuyển
-  if (ps2x.Button(PSB_PAD_UP)) {  // Tiến thẳng đều
+  // Movement
+  if (ps2x.Button(PSB_PAD_UP)) {  // Forward
     pwm.setPWM(DT, 0, sp);
     pwm.setPWM(AT, 0, 0);
     pwm.setPWM(DP, 0, sp);
@@ -99,7 +99,7 @@ void loop(){
     delay(50); 
   }
 
-  else if (ps2x.Button(PSB_PAD_DOWN)) {  // Lùi thẳng đều
+  else if (ps2x.Button(PSB_PAD_DOWN)) {  // Backward
     pwm.setPWM(AT, 0, sp);
     pwm.setPWM(DT, 0, 0);
     pwm.setPWM(AP, 0, sp);
@@ -108,7 +108,7 @@ void loop(){
     delay(50);
   }
 
-  else if (ps2x.Button(PSB_PAD_LEFT)) {  // Rẽ trái
+  else if (ps2x.Button(PSB_PAD_LEFT)) {  // Left
     pwm.setPWM(DT, 0, 0);
     pwm.setPWM(AT, 0, 0);
     pwm.setPWM(DP, 0, 1638);
@@ -118,7 +118,7 @@ void loop(){
   }
 
 
-  else if (ps2x.Button(PSB_PAD_RIGHT)) {  // Rẽ phải
+  else if (ps2x.Button(PSB_PAD_RIGHT)) {  // Right
     pwm.setPWM(DP, 0, 0);
     pwm.setPWM(AP, 0, 0);
     pwm.setPWM(DT, 0, 1638);
@@ -138,7 +138,7 @@ void loop(){
   } 
 
 
-  // Tăng tốc độ (Boost)
+  // Boost
   if (ps2x.ButtonPressed(PSB_L2)) {
     if (boost == false) {
       sp = 4095;
@@ -154,7 +154,7 @@ void loop(){
       delay(50);
     }
   }
-  // Cuốn bóng
+  // Intake
   if (ps2x.ButtonPressed(PSB_BLUE)) {
     if (cuon == false) {
       pwm.writeMicroseconds(SVD, 950);
@@ -177,7 +177,7 @@ void loop(){
   }
 
 
-  // Nhả bóng ra
+  // Reversed
   if (ps2x.ButtonPressed(PSB_GREEN)) {
     if (cuon == false) {
       pwm.writeMicroseconds(SVD, 950);
@@ -201,7 +201,7 @@ void loop(){
   }
 
 
-  // Bắn bóng
+  // Shoot
   if (ps2x.ButtonPressed(PSB_R1)) {
     if (ban == false) {
       pwm.writeMicroseconds(SVP, 700);
@@ -219,7 +219,7 @@ void loop(){
     }
   }
 
-  // Thả bóng lại phòng TH kẹt bóng
+  // Emergency button
   if (ps2x.ButtonPressed(PSB_R2)) {
     if (ban == false) {
       pwm.writeMicroseconds(SVT, 700);
@@ -237,7 +237,7 @@ void loop(){
     }
   }
 
-  // Quay bánh đà
+  // Starting to roll
   if (ps2x.ButtonPressed(PSB_L1)) {
     if (quaybanh == false) {
       pwm.setPWM(DBD, 0, 3276);
@@ -256,7 +256,7 @@ void loop(){
     }
   }
 
-  // Ngược bánh đà
+  // Reversed
     if (ps2x.ButtonPressed(PSB_L3)) {
     if (nguoc == false) {
       pwm.setPWM(ABD, 0, 3276);
@@ -275,7 +275,7 @@ void loop(){
     }
   }
 
-  // Mở rộng kho chứa
+  // Extension
   if (ps2x.Button(PSB_PINK) && ext < 2100) {
     ext += 50;
     pwm.writeMicroseconds(SVE, ext);
@@ -468,6 +468,3 @@ void loop(){
   }
 }
 
-
-
-// --- Cuối mỗi câu lệnh thêm delay để không bị loạn code --- //
