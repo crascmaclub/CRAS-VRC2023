@@ -1,6 +1,4 @@
 // Include các thư viện cần thiết
-abcxyz
-
 #include <Adafruit_PWMServoDriver.h>
 #include <PS2X_lib.h>
 #include <Wire.h>
